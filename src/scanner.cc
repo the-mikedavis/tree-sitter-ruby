@@ -97,6 +97,35 @@ const char NON_IDENTIFIER_CHARS[] = {
   '}',
 };
 
+bool in_error_recovery(const bool *valid_symbols) {
+  return (valid_symbols[LINE_BREAK] &&
+          valid_symbols[SIMPLE_SYMBOL] &&
+          valid_symbols[STRING_START] &&
+          valid_symbols[SYMBOL_START] &&
+          valid_symbols[SUBSHELL_START] &&
+          valid_symbols[REGEX_START] &&
+          valid_symbols[STRING_ARRAY_START] &&
+          valid_symbols[SYMBOL_ARRAY_START] &&
+          valid_symbols[HEREDOC_BODY_START] &&
+          valid_symbols[STRING_CONTENT] &&
+          valid_symbols[HEREDOC_CONTENT] &&
+          valid_symbols[STRING_END] &&
+          valid_symbols[HEREDOC_BODY_END] &&
+          valid_symbols[HEREDOC_START] &&
+          valid_symbols[FORWARD_SLASH] &&
+          valid_symbols[BLOCK_AMPERSAND] &&
+          valid_symbols[SPLAT_STAR] &&
+          valid_symbols[UNARY_MINUS] &&
+          valid_symbols[BINARY_MINUS] &&
+          valid_symbols[BINARY_STAR] &&
+          valid_symbols[SINGLETON_CLASS_LEFT_ANGLE_LEFT_ANGLE] &&
+          valid_symbols[HASH_KEY_SYMBOL] &&
+          valid_symbols[HASH_SPLAT_STAR_STAR] &&
+          valid_symbols[BINARY_STAR_STAR] &&
+          valid_symbols[ELEMENT_REFERENCE_BRACKET] &&
+          valid_symbols[NONE]);
+}
+
 struct Scanner {
   Scanner() : has_leading_whitespace(false) {}
 
@@ -732,6 +761,9 @@ struct Scanner {
   }
 
   bool scan(TSLexer *lexer, const bool *valid_symbols) {
+    if (in_error_recovery(valid_symbols))
+      return false;
+
     has_leading_whitespace = false;
 
     // Contents of literals, which match any character except for some close delimiter
